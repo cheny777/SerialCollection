@@ -25,11 +25,11 @@ protected:
 
 private:
     /*最大*/
-    int m_max,m_max2;
+    double m_max,m_max2;
     /*最小*/
-    int m_min,m_min2;
+    double m_min,m_min2;
     /*平均*/
-    int mean;
+    double mean;
     /*数据的个数*/
     int datanum;
     /*数据容器*/
