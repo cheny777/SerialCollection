@@ -96,11 +96,11 @@ void DrawLine::paintEvent(QPaintEvent *e)
                          mheight-(mquevedouble[i+1]-m_min)*ky
                 );
 
-        if(mquevedouble[i] >= m_max-1)
+        if(mquevedouble[i] >= m_max-0.00001)
         {
             m_max2 = i;
         }
-        if(mquevedouble[i] <= m_min+1)
+        if(mquevedouble[i] <= m_min+0.00001)
         {
             m_min2 = i;
         }
