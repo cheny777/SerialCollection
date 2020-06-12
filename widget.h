@@ -38,6 +38,21 @@ private:
 
     /*巴特沃斯低通滤波器*/
     math::LowPassFilter2p *lowFilter;
+
+
+    /*标定容器*/
+    QList<double> biaodingKList;
+    QList<double> biaodingZList;
+
+    bool m_bbiaoding;
+    int m_Btype;
+
+    /*标定零位*/
+    double m_Zero;
+    double m_biaoK;
+    /*采集点数*/
+    int collectionNUM;
+
 private slots:
     void slotSerialMessgae();
     void slotopenSerial();
@@ -46,6 +61,10 @@ private slots:
 
 
 
+    void on_collectionbtn_clicked();
+    void on_stopCollectionbtn_clicked();
+    void on_biaodingBrn_clicked();
+    void on_CollectionCombox_currentIndexChanged(int index);
 };
 
 #endif // WIDGET_H
