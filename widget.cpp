@@ -75,6 +75,14 @@ Widget::Widget(QWidget *parent) :
 
     /*巴特沃斯滤波*/
     lowFilter = new math::LowPassFilter2p(0.01,1);
+
+    m_bbiaoding = false;
+    ui->CollectionCombox->addItem("悬空");
+    ui->CollectionCombox->addItem("挂物");
+    m_Btype = 0;
+
+    m_biaoK = 1;
+    m_Zero = 0;
 }
 
 Widget::~Widget()
@@ -192,25 +200,40 @@ void Widget::slotreadSerial()
                 //mdrawLine->setData(LowPassFilter_Average(FilterDitong2(blist[ui->comboBox_6->currentIndex()])));
 
                 //mdrawLine->setData(FilterDitong2(LowPassFilter_Average(blist[ui->comboBox_6->currentIndex()])));
-
+                double lvbo = (blist[ui->comboBox_6->currentIndex()]-m_Zero)*m_biaoK;
                 switch (ui->comboBox_7->currentIndex()) {
                 case 0:
-                    mdrawLine->setData(FilterDitong2(blist[ui->comboBox_6->currentIndex()]));
+                    lvbo = FilterDitong2(lvbo);
                     break;
                 case 1:
-                    mdrawLine->setData(LowPassFilter_Average(blist[ui->comboBox_6->currentIndex()]));
+                    lvbo = LowPassFilter_Average(lvbo);
                     break;
                 case 2:
-                    mdrawLine->setData(LowPassFilter_Average(FilterDitong2(blist[ui->comboBox_6->currentIndex()])));
+                    lvbo = LowPassFilter_Average(FilterDitong2(lvbo));
                     break;
                 case 3:
-                    mdrawLine->setData(blist[ui->comboBox_6->currentIndex()]);
+                    lvbo = lvbo;
                     break;
                 default:
                     break;
                 }
 
+                if(m_bbiaoding)
+                {
+                    if(m_Btype == 0)
+                    {
+                        biaodingKList.push_back(lvbo);
+                    }
+                    else
+                    {
+                        biaodingZList.push_back(lvbo);
+                    }
+                    ui->labelCollectionnum->setText(QString::number(collectionNUM));
+                    collectionNUM++;
 
+                }
+                mdrawLine->setData(lvbo);
+                //qDebug()<<lvbo;
                 strTemporary.clear();
 
             }
@@ -225,4 +248,49 @@ void Widget::slotstopSerial()
     serial->clear();
     serial->close();
     serial->deleteLater();
+}
+
+void Widget::on_collectionbtn_clicked()
+{
+    collectionNUM = 0;
+    m_bbiaoding = true;
+    if(m_Btype == 0)
+    {
+        biaodingKList.clear();
+    }
+    else
+    {
+        biaodingZList.clear();
+    }
+
+}
+
+void Widget::on_stopCollectionbtn_clicked()
+{
+     m_bbiaoding = false;
+}
+
+void Widget::on_biaodingBrn_clicked()
+{
+    double Nn = ui->lineEditN->text().toDouble();
+    double pingjun = 0;
+    for(int i = 0;i<biaodingKList.size();i++)
+    {
+        pingjun+=biaodingKList[i];
+    }
+    m_Zero = pingjun/(double)biaodingKList.size();
+
+     pingjun = 0;
+    for(int i =0;i<biaodingZList.size();i++)
+    {
+        pingjun+=biaodingZList[i];
+    }
+    pingjun = pingjun/(double)biaodingZList.size();
+
+    m_biaoK = Nn/(double)(pingjun- m_Zero);
+}
+
+void Widget::on_CollectionCombox_currentIndexChanged(int index)
+{
+    m_Btype = index;
 }
